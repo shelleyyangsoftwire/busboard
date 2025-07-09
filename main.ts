@@ -1,28 +1,33 @@
-var readline = require('readline');
+var getResponse = require('prompt-sync')();
 
-var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 
-var busID:string = '';
+interface busInfo {
+    lineName: string
+    destinationName: string
+    timeToStation: number
+}
 
-rl.question("Enter your bus stop id ", function(answer:string) {
-    busID = answer;
-    fetchData();
-    rl.close();
-});
-
-const fetchData = async () => {
+const fetchData = async (stopID: string): Promise<JSON | undefined> => {
     try {
-        const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${busID}/Arrivals`);
+        const response = await fetch(`https://api.tfl.gov.uk/StopPoint/${stopID}/Arrivals`);
         const responseJson = await response.json();
-        console.log(responseJson)
+        return responseJson;
     } catch (error: any) {
-        console.error(error)
-    } finally {
-        console.log("Request complete")
+        console.error(error);
+        return undefined;
     }
 }
 
+const main = async (): Promise<undefined> => {
 
+        let stopID = getResponse('Enter stop ID: ');
+        let responses = await fetchData(stopID);
+        console.log(responses);
+        /*
+        for (let i = 0 ; i < 5; i++){
+            console.log(responses);
+        } */
+
+}
+
+main();
